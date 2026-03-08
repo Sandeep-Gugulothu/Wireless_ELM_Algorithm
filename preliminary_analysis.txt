@@ -1,0 +1,8 @@
+# Preliminary System Analysis - March 2026
+Initial parameters for the wireless signal detection simulation:
+
+- Modulation: BPSK (Binary Phase Shift Keying)
+- System Architecture: 2x2 MIMO and 3-receiver diversity
+- Channel Model: Frequency-selective Rayleigh Fading
+- Detection Target: Evaluate Bit Error Rate (BER) vs SNR (0dB to 20dB)
+- Initial Neural Parameters: ELM Hidden Nodes = 50-200
