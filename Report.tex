@@ -1,0 +1,630 @@
+\documentclass[10pt, conference]{IEEEtran}
+%
+\usepackage{amsmath,amsfonts,amssymb}
+\usepackage{algorithmic}
+\usepackage{algorithm}
+\usepackage{multirow}  
+\usepackage{graphicx}      
+\usepackage{amssymb}  
+\usepackage{xcolor}        
+\usepackage{array}         
+%\usepackage{setspace}
+\usepackage[caption=false,font=normalsize,labelfont=sf,textfont=sf]{subfig}
+\usepackage{textcomp}
+\usepackage{stfloats}
+\usepackage{url}
+\usepackage[hidelinks]{hyperref}
+\usepackage{verbatim}
+\usepackage{graphicx}
+\usepackage{cite}
+\usepackage{mathtools}
+\usepackage[algochapter,algoruled, resetcount, algo2e,ruled,lined,boxed]{algorithm2e}
+\usepackage[mathscr]{euscript}
+\newcommand\scalemath[2]{\scalebox{#1}{\mbox{\ensuremath{\displaystyle #2}}}}
+\newcommand{\qed}{\hfill $\blacksquare$}
+\SetCommentSty{nmb}
+\SetKw{Initialize}{Initialize:}
+\SetKwRepeat{Repeat}{Repeat}{Until}
+\usepackage{listings}
+\usepackage{xcolor}
+
+% Define Python style for listings
+\lstset{
+    language=Python,
+    basicstyle=\ttfamily\footnotesize,
+    keywordstyle=\color{blue}\bfseries,
+    commentstyle=\color{green!60!black}\itshape,
+    stringstyle=\color{orange},
+    numbers=none,
+    numberstyle=\tiny\color{gray},
+    stepnumber=1,
+    numbersep=5pt,
+    backgroundcolor=\color{gray!5},
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    frame=single,
+    rulecolor=\color{black},
+    tabsize=4,
+    captionpos=b,
+    breaklines=true,
+    breakatwhitespace=false,
+    title=\lstname,
+    escapeinside={\%*}{*)},
+    morekeywords={self, np, plt}
+}
+
+\begin{document}
+\setlength{\abovedisplayskip}{5pt}
+\setlength{\belowdisplayskip}{5pt}
+\setlength{\floatsep}{5 pt}
+\setlength{\textfloatsep}{4 pt}
+
+\title{Application of Deep Learning in Wireless Communication: Signal Detection and Channel Estimation}
+
+\author{\IEEEauthorblockN{Yesh Lohchab - 230102115, Gugulothu Sandeep - 230102034, Banavathu Tarun Naik - 230102097 }
+\IEEEauthorblockA{Department of Electrical Engineering, IIT Guwahati \\
+Course Code: EE337}
+}
+
+\maketitle
+\begin{abstract}
+Wireless communication systems are rapidly evolving with the development of 5G and beyond technologies, demanding higher data rates, improved spectral efficiency, and reliable signal transmission in complex environments. However, wireless communication systems still face major challenges such as multipath fading, signal interference, channel estimation errors, and high bit error rates (BER), which reduce overall communication performance. Traditional signal detection and channel estimation techniques often struggle to maintain high accuracy and robustness under dynamic wireless conditions. To address these limitations, this work explores the application of deep learning techniques in wireless communication signal detection and channel estimation. In particular, Autoencoder (AE), Extreme Learning Machine (ELM), and Deep Neural Network (DNN)-based approaches are studied for improving detection accuracy and reducing computational complexity. A proof-of-concept analysis of AE-ELM-based wireless signal detection and deep-learning-based channel estimation is presented. The studied methods demonstrate improved BER performance, enhanced feature extraction capability, faster computation, and better robustness compared to conventional approaches. Furthermore, the report discusses research gaps in existing systems and highlights the potential of lightweight and adaptive deep learning frameworks for future wireless communication networks.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Wireless communication, deep learning, signal detection, channel estimation, AE-ELM, IRS, ISAC.
+\end{IEEEkeywords}
+
+
+
+\section{Introduction}
+\subsection{Brief introduction to your research topic} 
+
+The rapid expansion of wireless communication services has led to the development of next-generation networks, including 5G and the upcoming 6G standards. These systems aim to provide ultra-reliable low-latency communication (URLLC), massive machine-type communications (mMTC), and enhanced mobile broadband (eMBB) \cite{liu2023}. Key technologies such as Massive MIMO, Intelligent Reflecting Surfaces (IRS), and Integrated Sensing and Communication (ISAC) \cite{liu2022} are being integrated to meet the escalating demands for higher data rates, improved spectral efficiency, and greater network capacity.
+
+Despite these advancements, wireless signal transmission remains susceptible to various physical layer impairments. Multipath fading, noise interference, and shadowing often degrade signal quality, leading to significant channel estimation errors and high Bit Error Rates (BER). In complex and dynamic environments, such as urban canyons or high-mobility scenarios, maintaining a robust communication link becomes increasingly difficult, posing a major hurdle for the seamless operation of modern wireless networks.
+
+Conventional signal detection and channel estimation techniques, such as Minimum Mean Square Error (MMSE) and other model-based linear detectors, often rely on specific mathematical assumptions about the channel statistics. While these methods are well-understood, they frequently struggle with high computational complexity in massive MIMO systems and lack the necessary robustness to adapt to rapidly changing wireless conditions. Furthermore, their performance is limited when the underlying channel model is partially known or highly non-linear.
+
+Deep learning (DL) has emerged as a transformative tool for wireless communications due to its ability to learn complex, non-linear relationships directly from data \cite{gunduz2019}. Unlike traditional model-based approaches, DL-based frameworks like Deep Neural Networks (DNN), Convolutional Neural Networks (CNN), and Autoencoders (AE) can extract intricate features from raw signal data without requiring explicit channel models. These data-driven techniques offer improved adaptability, lower latency during inference, and the potential to significantly enhance detection accuracy and channel estimation performance.
+
+This report explores the application of lightweight and efficient deep learning architectures for improving wireless communication performance. Specifically, we investigate the use of Autoencoders (AE) combined with Extreme Learning Machines (ELM) for signal detection \cite{zhao2023}, as well as DNN-based channel estimation for IRS-assisted ISAC systems \cite{liu2022}. The focus is on demonstrating how these DL-based methods can achieve superior BER performance and faster computation compared to conventional algorithms, thereby addressing the research gaps in current wireless communication frameworks.
+
+
+
+\subsection{Related works} 
+
+The rapid evolution of wireless communication systems and the increasing demand for high-speed, reliable, and intelligent connectivity have spurred significant interest in integrating machine learning and deep learning into physical layer problems. In recent years, researchers have moved toward data-driven approaches for signal detection, channel estimation, and resource optimization to overcome the inherent constraints of traditional model-based communication techniques.
+
+A comprehensive perspective on this shift was provided by Gündüz et al. \cite{gunduz2019} in their work, ``Machine Learning in the Air.'' The authors discuss the growing importance of deep learning in wireless networks, particularly for tasks like signal detection and interference management. They argue that while conventional methods rely on precise mathematical models, these models often falter in the face of the highly dynamic and nonlinear nature of real-world channels. Deep learning, however, can learn these complexities directly from data. While the paper showcases how models like Autoencoders and DNNs can outperform traditional approaches under non-ideal conditions, it also candidly addresses the hurdles that remain, such as computational complexity and the difficulty of real-time deployment.
+
+To specifically tackle the challenges of signal detection in complex MIMO systems, the study in \cite{zhao2023} proposed a hybrid framework that fuses Autoencoder (AE) principles with the Extreme Learning Machine (ELM) algorithm. Traditional detection algorithms often struggle to find a balance between computational cost and Bit Error Rate (BER) performance, especially as systems scale up. By using an autoencoder for robust feature extraction and ELM for rapid classification, the authors developed a model that achieves lower BER and faster processing times than previous methods. This work underscores how deep learning can enhance robustness in messy communication environments, though it leaves open questions regarding scalability and performance in extremely high-mobility scenarios.
+
+Further exploring the frontiers of 6G, Liu et al. \cite{liu2022} introduced a deep learning framework for channel estimation in Intelligent Reflecting Surface (IRS)-assisted Integrated Sensing and Communication (ISAC) systems. Recognizing that accurate Channel State Information (CSI) is vital for next-generation networks, they designed dedicated DNN architectures for both sensing and communication tasks. Their results show that these data-driven models significantly outperform standard least squares estimation, particularly in noisy environments. However, the study also notes that the increased training complexity and data requirements present practical challenges for deployment on resource-constrained edge devices.
+
+Collectively, these works demonstrate that deep learning has moved from a theoretical possibility to a powerful tool for improving wireless communication. While hybrid architectures like AE-ELM and DNN-based estimators have shown great success in mitigating interference and reducing errors, gaps still remain. The need for more lightweight, computationally efficient models that can stay robust in rapidly changing environments continues to drive the field forward, motivating the search for adaptive frameworks suitable for real-world, real-time application.
+
+
+\section{Proof of Concept} 
+\subsection{System Model}
+In wireless communication, signal detection is a critical task used to distinguish different signal types and determine the presence or absence of signals. Common communication signals include Pulse Amplitude Modulation (PAM), Orthogonal Frequency Division Multiplexing (OFDM), and Multiple-Input Multiple-Output (MIMO). Traditional signal detection methods are usually based on rule modeling and predefined feature extraction, which often struggle with adaptability in complex scenarios where signal characteristics are difficult to define. Furthermore, the accuracy and robustness of these methods are sensitive to factors like Signal-to-Noise Ratio (SNR) and multipath fading. To address these challenges, Artificial Intelligence (AI) techniques, particularly Autoencoder (AE) and Extreme Learning Machine (ELM) algorithms, have been widely integrated into signal detection models.
+
+The AE network is an unsupervised learning algorithm formed by stacking hidden layers, capable of reproducing the original input. It allows for the automatic extraction of features from small, unlabelled samples, which significantly improves the speed compared to manual feature extraction. A standard AE network consists of three layers: an input layer, an implicit (hidden) layer, and an output layer.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\columnwidth]{Auto-encoder_network_model.png}
+    \caption{Auto-encoder network model \cite{zhao2023}.}
+    \label{fig:ae_model}
+\end{figure}
+
+As shown in Fig. \ref{fig:ae_model}, the AE network can be divided into encoding and decoding parts. In the encoding stage, the input vector $x$ is mapped to an intermediate representation $y$ using an activation function $f_\theta$:
+\begin{equation}
+y = f_\theta(x) = s(wx + b)
+\end{equation}
+where $b$ is the coding bias and $w$ is the coding weight. In the decoding stage, the intermediate representation $y$ is mapped using function $g_\theta$ to obtain reconstructed data $z$:
+\begin{equation}
+z = g_\theta(y) = s(w'y + b')
+\end{equation}
+where $b'$ is the bias term, $w'$ is the decoding weight, and $s$ is the sigmoid activation function. The AE model uses unsupervised learning to minimize the reconstruction error:
+\begin{equation}
+\min_\theta J_{AE}(\theta) = \sum_{i=1}^{n} L(x_i, z_i)
+\end{equation}
+where the parameters $\theta = \{w, b, w', b'\}$ are typically optimized using gradient descent:
+\begin{equation}
+\theta = \{w, b, w', b'\}
+\end{equation}
+The cost function for the reconstruction error is given by:
+\begin{equation}
+L(x, y) = \sum_{i=1}^{n} \|x_i - z_i\|^2
+\end{equation}
+where $x_i$ is the $i$-th input sample and $z_i$ is the reconstructed output.
+
+While the AE extracts features, the ELM—a single hidden layer feed-forward neural network—provides rapid learning capabilities for complex nonlinear mapping \cite{huang2012}. Unlike traditional networks, ELM connection weights for the input layer are generated at random, which significantly reduces computation time.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\columnwidth]{AE-ELM_signal_detection_model.png}
+    \caption{ELM network structure \cite{zhao2023}.}
+    \label{fig:elm_structure}
+\end{figure}
+
+\subsection{Analysis}
+The training process for ELM involves a training set $\{x_i, t_i\}$, where $x_i \in \mathbb{R}^d$ and $t_i \in \mathbb{R}^m$ \cite{huang2012}. The hidden layer output matrix $H$ is represented as:
+\begin{equation}
+H = \begin{bmatrix} h(x_1) \\ \vdots \\ h(x_N) \end{bmatrix} = \begin{bmatrix} h_1(x_1) & \dots & h_L(x_1) \\ \vdots & \ddots & \vdots \\ h_1(x_N) & \dots & h_L(x_N) \end{bmatrix}
+\end{equation}
+where $L$ is the number of neurons in the hidden layer. The output value of the $j$-th hidden node for a training sample $x_n$ is:
+\begin{equation}
+h_j(x_n) = g\left( \sum_i x_n(i) \cdot a_{i,j} + b_j \right)
+\end{equation}
+Here, $a_{i,j}$ are random connection weights and $b_j$ is the bias. To ensure stability and generalization, ridge regression theory is used to compute the output weights $\beta$:
+\begin{equation}
+\beta = T \cdot H^T \left( \frac{I}{C} + HH^T \right)^{-1}
+\end{equation}
+where $C$ is the activation factor. The corresponding output function of the ELM network is:
+\begin{equation}
+f(x) = T \cdot H^T \left( \frac{I}{C} + HH^T \right)^{-1} \cdot g(Wx + b)
+\end{equation}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.9\columnwidth]{Block_Diagram_AE-ELM.png}
+    \caption{Block diagram of AE-ELM detection algorithm \cite{zhao2023}.}
+    \label{fig:ae_elm_block}
+\end{figure}
+
+The AE-ELM detection algorithm (Fig. \ref{fig:ae_elm_block}) combines these architectures across training and detection phases. During training, the AE extracts expression features:
+\begin{equation}
+h = f_\theta(W \cdot x + b)
+\end{equation}
+\begin{equation}
+x' = f_{\theta'}(W' \cdot h + b')
+\end{equation}
+The cost function is regularized to maintain stability:
+\begin{equation}
+J = \|x - x'\|^2 + \lambda \cdot (\|W\|^2 + \|W'\|^2)
+\end{equation}
+where $\lambda$ is the regularization factor. After AE feature extraction, the final output feature mapping is used as input for ELM training:
+\begin{equation}
+\beta = y \cdot (a \cdot h + b)^{-1}
+\end{equation}
+
+In summary, the AE-ELM fusion leverages the adaptive feature extraction of AE and the rapid classification of ELM to improve detection accuracy and reliability across diverse wireless signal scenarios.
+
+The proposed AE-ELM system utilizes a two-stage learning architecture: an Autoencoder (AE) for feature representation and an Extreme Learning Machine (ELM) for analytical signal recovery. This is compared against traditional Zero-Forcing (ZF) and Minimum Mean Square Error (MMSE) detectors, as well as iterative Successive Interference Cancellation (SIC) schemes and the optimal Maximum Likelihood (ML) bound.
+
+\subsection{Results and Discussions}
+The performance of the AE-ELM detector was evaluated through extensive simulations reproducing the conditions specified by Zhao et al. \cite{zhao2023}. The evaluation was conducted across two primary configurations: a $4 \times 4$ MIMO system using BPSK modulation and a 3-receiver OFDM system. Remarkably, both configurations yielded almost identical performance improvements, demonstrating the high versatility and robustness of the AE-ELM framework across different physical layer architectures.
+
+\begin{figure*}[t]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{fig1_ber_vs_snr.png}
+        \caption{BER vs SNR performance comparison.}
+        \label{fig:ber_results}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{fig2_accuracy_vs_snr.png}
+        \caption{Prediction Accuracy across varying SNR levels.}
+        \label{fig:accuracy_results}
+    \end{minipage}
+\end{figure*}
+
+As illustrated in Fig. \ref{fig:ber_results}, the AE-ELM detector consistently achieves the lowest bit error rate for all SNR values compared to all other modeled algorithms (ZF, MMSE, and SIC). While traditional linear detectors like Zero-Forcing suffer from significant noise enhancement in low-SNR regions, the AE-ELM leverages its unsupervised autoencoder to extract noise-robust latent features, creating a more effective decision boundary. The quantitative BER and accuracy results from our simulation are summarized in Table \ref{tab:performance_summary}.
+
+\begin{table}[ht]
+\centering
+\caption{AE-ELM Performance Summary ($4 \times 4$ MIMO)}
+\label{tab:performance_summary}
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{SNR (dB)} & \textbf{AE-ELM BER} & \textbf{AE-ELM Accuracy (\%)} \\ \hline
+1  & 0.09010 & 89.4\% \\ \hline
+3  & 0.05235 & 95.8\% \\ \hline
+5  & 0.03788 & 97.8\% \\ \hline
+7  & 0.00205 & 99.4\% \\ \hline
+9  & 0.00069 & 98.8\% \\ \hline
+11 & 0.00410 & 100.0\% \\ \hline
+13 & 0.00010 & 100.0\% \\ \hline
+15 & 0.00001 & 100.0\% \\ \hline
+\end{tabular}
+\end{table}
+
+
+
+The prediction accuracy analysis (Fig. \ref{fig:accuracy_results}) further highlights the model's superiority, achieving the highest accuracy at every SNR point. The model reaches near-perfect accuracy (99.4\%) as early as 7 dB and maintains 100\% stability beyond 11 dB. Furthermore, our sensitivity analysis (Fig. \ref{fig:sensitivity_bpsk} and Fig. \ref{fig:ofdm_sensitivity}) reveals that the system exhibits low sensitivity to variations in the activation factor $C$ and the number of hidden nodes $L$, provided they are within the optimal range defined by the architecture. This stability makes it highly suitable for practical deployment in varying wireless environments.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.9\columnwidth]{Sensitivity_BPSK.png}
+    \caption{Sensitivity Analysis for BPSK modulation.}
+    \label{fig:sensitivity_bpsk}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.9\columnwidth]{OFDM_Sensitivity.jpeg}
+    \caption{System sensitivity under OFDM configurations.}
+    \label{fig:ofdm_sensitivity}
+\end{figure}
+
+The extreme computational efficiency of the framework is illustrated in Fig. \ref{fig:time_complexity}. By avoiding iterative backpropagation in the ELM layer, the system achieves detection times significantly lower than conventional deep neural network approaches.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.9\columnwidth]{TIme_complexity_OFDM.jpeg}
+    \caption{Relative Time Complexity comparison.}
+    \label{fig:time_complexity}
+\end{figure}
+
+
+
+\section{PROPOSED NOVEL EXTENSION: ATTENTION-ASSISTED ONLINE SPARSE AE-ELM FOR MASSIVE MIMO-OFDM SYSTEMS}
+
+The existing implementation combines Orthogonal Frequency Division Multiplexing (OFDM), multi-receiver diversity, Autoencoder-assisted Extreme Learning Machine (AE-ELM) detection, and conventional Least Squares (LS) and Minimum Mean Square Error (MMSE) baselines. However, the implemented system assumes quasi-static Rayleigh fading channels, offline training, fixed hidden random mappings, and ideal hardware conditions. These assumptions limit the applicability of the model in practical high-mobility wireless communication systems such as Vehicular-to-Everything (V2X), Unmanned Aerial Vehicle (UAV) communications, and sixth-generation (6G) massive MIMO networks.
+
+To address these limitations, a novel extension is proposed in the form of an \textbf{Attention-Assisted Online Sparse AE-ELM detector for Massive MIMO-OFDM systems under doubly selective fading channels}. The proposed architecture introduces adaptive learning, sparse representation, attention mechanisms, and online sequential training to improve robustness and scalability.
+
+\subsection{Problem Statement}
+
+The current AE-ELM implementation suffers from several limitations under realistic wireless conditions:
+
+\begin{itemize}
+    \item Inability to adapt to rapidly time-varying channels.
+    \item Sensitivity to Doppler spread and mobility-induced fading.
+    \item Dependence on dense pilot allocation.
+    \item Scalability issues in massive MIMO systems.
+    \item Lack of robustness against hardware impairments.
+\end{itemize}
+
+Since the hidden random projections in ELM remain fixed after initialization, the detector cannot adapt to changing channel statistics or dynamic interference conditions. Consequently, performance degrades significantly in high-mobility and low-SNR environments.
+
+\subsection{Proposed Architecture}
+
+The proposed system replaces the conventional static AE-ELM detector with the following adaptive framework:
+
+\[
+\resizebox{\columnwidth}{!}{
+\boxed{
+Y
+\rightarrow
+\text{Sparse Denoising Autoencoder}
+\rightarrow
+\text{Attention Layer}
+\rightarrow
+\text{Online Sequential ELM}
+\rightarrow
+\hat{X}
+}
+}
+\]
+
+where:
+\begin{itemize}
+    \item $Y$ denotes the received OFDM symbols,
+    \item the Sparse Denoising Autoencoder extracts robust latent features,
+    \item the Attention Layer assigns importance weights to reliable subcarriers and antennas,
+    \item the Online Sequential ELM performs adaptive symbol detection,
+    \item $\hat{X}$ represents the estimated transmitted symbols.
+\end{itemize}
+
+\subsection{Sparse Denoising Autoencoder}
+
+The original autoencoder reconstructs the received input directly:
+
+\[
+\hat{x} = H_{\text{AE}}\beta_{\text{AE}}
+\]
+
+where $H_{\text{AE}}$ is the hidden layer output and $\beta_{\text{AE}}$ represents the reconstruction weights.
+
+To improve robustness, sparsity regularization and denoising are introduced. The modified loss function becomes:
+
+\[
+\mathcal{L}
+=
+\|x - \hat{x}\|^2
++
+\lambda \|h\|_1
+\]
+
+where:
+\begin{itemize}
+    \item $\|x - \hat{x}\|^2$ is the reconstruction loss,
+    \item $\|h\|_1$ enforces sparsity in latent features,
+    \item $\lambda$ is the regularization parameter.
+\end{itemize}
+
+This enables the model to learn compact and noise-resistant feature representations.
+
+\subsection{Attention Mechanism}
+
+In OFDM systems, not all subcarriers experience identical channel quality. Therefore, an attention mechanism is introduced to assign adaptive importance weights to subcarriers and antennas.
+
+The attention coefficients are computed as:
+
+\[
+\alpha_i
+=
+\frac{
+\exp(e_i)
+}{
+\sum_j \exp(e_j)
+}
+\]
+
+where:
+
+\[
+e_i = W^T h_i
+\]
+
+Here:
+\begin{itemize}
+    \item $h_i$ denotes the latent feature vector,
+    \item $W$ is the learnable attention parameter matrix,
+    \item $\alpha_i$ is the normalized attention weight.
+\end{itemize}
+
+This mechanism allows the detector to focus on reliable channel components while suppressing noisy subcarriers.
+
+\subsection{Online Sequential Extreme Learning Machine}
+
+The current implementation performs offline training only once. In practical wireless systems, channel conditions continuously change over time. Therefore, Online Sequential ELM (OS-ELM) is introduced to recursively update the output weights.
+
+The recursive update equation is given by:
+
+\[
+\beta_{k+1}
+=
+\beta_k
++
+P_{k+1} h_{k+1}
+\left(
+T_{k+1}
+-
+h_{k+1}^T \beta_k
+\right)
+\]
+
+where:
+\begin{itemize}
+    \item $\beta_k$ represents the current output weights,
+    \item $h_{k+1}$ is the hidden layer output of the new sample,
+    \item $T_{k+1}$ is the target output,
+    \item $P_{k+1}$ is the recursive covariance matrix.
+\end{itemize}
+
+This enables real-time adaptation to dynamic channel conditions.
+
+\subsection{Massive MIMO Extension}
+
+The original implementation considers only a small number of receive antennas:
+
+\[
+N_r = 3
+\]
+
+The proposed extension scales the system to massive MIMO configurations such as:
+
+\[
+32 \times 32, \quad 64 \times 64
+\]
+
+However, massive antenna arrays significantly increase computational complexity and dimensionality. To address this challenge, the following techniques are incorporated:
+
+\begin{itemize}
+    \item Low-rank latent feature compression,
+    \item Antenna selection using attention mechanisms,
+    \item Reduced-dimensional random projections.
+\end{itemize}
+
+This improves scalability for next-generation wireless systems.
+
+\subsection{Doubly Selective Channel Model}
+
+The current channel model considers only frequency-selective fading. In realistic mobile scenarios, the channel is both time-selective and frequency-selective.
+
+The proposed channel model is:
+
+\[
+h(t,\tau)
+=
+\sum_{l=1}^{L}
+\alpha_l(t)\delta(\tau - \tau_l)
+\]
+
+where:
+\begin{itemize}
+    \item $\alpha_l(t)$ denotes the time-varying path gain,
+    \item $\tau_l$ represents the path delay,
+    \item $L$ is the number of multipath components.
+\end{itemize}
+
+This enables simulation of Doppler effects and mobility-induced fading.
+
+\subsection{Pilot Reduction and Spectral Efficiency}
+
+Conventional LS and MMSE methods require dense pilot allocation for accurate channel estimation. The proposed AE-ELM framework can infer channel characteristics from sparse pilot information using learned latent representations.
+
+The resulting benefits include:
+
+\begin{itemize}
+    \item Reduced pilot overhead,
+    \item Improved spectral efficiency,
+    \item Lower transmission redundancy.
+\end{itemize}
+
+\subsection{Hardware Impairment Robustness}
+
+Real-world wireless transceivers suffer from hardware impairments such as:
+
+\begin{itemize}
+    \item IQ imbalance,
+    \item Phase noise,
+    \item Power amplifier nonlinearity,
+    \item ADC quantization noise.
+\end{itemize}
+
+The proposed denoising sparse AE can be trained to compensate for these impairments, thereby improving detection accuracy in practical systems.
+
+\subsection{Computational Complexity}
+
+The conventional AE-ELM implementation has computational complexity:
+
+\[
+O(NL^2)
+\]
+
+where:
+\begin{itemize}
+    \item $N$ is the number of training samples,
+    \item $L$ is the number of hidden nodes.
+\end{itemize}
+
+Using Online Sequential ELM reduces the update complexity to:
+
+\[
+O(L^2)
+\]
+
+which significantly improves computational efficiency for real-time deployment.
+
+\subsection{Experimental Evaluation}
+
+The proposed system can be evaluated using the following metrics:
+
+\begin{itemize}
+    \item Bit Error Rate (BER) versus SNR,
+    \item BER versus Doppler frequency,
+    \item BER versus pilot density,
+    \item Throughput versus antenna count,
+    \item Spectral efficiency,
+    \item Energy efficiency,
+    \item Online adaptation convergence speed.
+\end{itemize}
+
+\subsection{Expected Outcomes}
+
+The proposed Attention-Assisted Online Sparse AE-ELM detector is expected to achieve:
+
+\begin{itemize}
+    \item Lower BER than LS, MMSE, and conventional ELM,
+    \item Faster convergence than deep CNN-based detectors,
+    \item Improved robustness under high mobility,
+    \item Reduced pilot overhead,
+    \item Lower computational complexity for massive MIMO systems.
+\end{itemize}
+
+\section{Conclusion}
+This report has investigated the application of deep learning techniques in the physical layer of wireless communication, specifically focusing on the integration of Autoencoders (AE) and Extreme Learning Machines (ELM) for signal detection. Our extensive simulation results across $4 \times 4$ MIMO BPSK and multi-receiver OFDM configurations demonstrate that the AE-ELM framework consistently achieves the lowest bit error rate (BER) and the highest prediction accuracy among all modeled algorithms. By leveraging unsupervised feature extraction in the AE layer and rapid analytical weight solving in the ELM layer, the system provides a robust decision boundary even in low-SNR environments where traditional linear detectors like Zero-Forcing (ZF) and MMSE fail due to noise enhancement.
+
+Furthermore, the study highlights the extreme computational efficiency of the AE-ELM architecture. Unlike iterative deep learning models that require time-consuming backpropagation, the proposed framework utilizes analytical ridge regression to determine output weights in a single step. This speed advantage, combined with the model's low sensitivity to hyperparameter variations, makes it an ideal candidate for real-time deployment in latency-sensitive 5G and 6G services.
+
+Finally, to address the challenges of high mobility and non-stationary channel conditions, we proposed a novel extension: the Attention-Assisted Online Sparse AE-ELM. By incorporating sparse representation learning and attention-driven resource weighting, this adaptive framework establishes a roadmap for the next generation of intelligent, autonomous receivers. In conclusion, the transition toward hybrid data-driven architectures like AE-ELM represents a significant advancement in achieving reliable, high-capacity, and computationally efficient wireless connectivity for the future.
+
+\section{Appendix: Python Implementation}
+The complete Python implementation of the AE-ELM signal detection system is summarized below. For the full source code and simulation environment, please refer to the \href{https://github.com/Sandeep-Gugulothu/Wireless_ELM_Algorithm}{GitHub Repository}.
+
+\subsection{MIMO-OFDM System Model (Environment)}
+This component represents the transmitter and the complex fading channel, combining OFDM modulation with Rayleigh MIMO effects.
+
+\begin{lstlisting}[language=Python]
+# From ofdm_ae_elm_comparison.py (OFDM Transmitter)
+def ofdm_tx(mod_symbols, n_fft, n_cp):
+    """Frequency to Time domain conversion with Cyclic Prefix"""
+    time_data = np.fft.ifft(mod_symbols, axis=1)
+    cp = time_data[:, -n_cp:]
+    return np.concatenate((cp, time_data), axis=1)
+
+# From mimo_4.py (Rayleigh MIMO Channel)
+def rayleigh_channel(Nr, Nt):
+    """H Matrix: Representation of the wireless fading environment"""
+    return (np.random.randn(Nr, Nt) + 1j * np.random.randn(Nr, Nt)) / np.sqrt(2)
+
+def awgn(signal, snr_db):
+    """Additive White Gaussian Noise based on Signal-to-Noise Ratio"""
+    ebn0_lin = 10 ** (snr_db / 10.0)
+    sigma = np.sqrt(Nt / (2.0 * ebn0_lin))
+    noise = sigma * (np.random.randn(*signal.shape) + 1j * np.random.randn(*signal.shape))
+    return signal + noise
+\end{lstlisting}
+
+\subsection{The Proposed AE-ELM Detector}
+The core neural architecture consists of an unsupervised Autoencoder for feature extraction followed by a rapid ELM classifier.
+
+\begin{lstlisting}[language=Python]
+class AE_ELM:
+    def __init__(self, input_size, ae_hidden_size, elm_hidden_size, output_size):
+        # Autoencoder Stage: Dimensionality reduction/feature extraction
+        self.rand_w = np.random.randn(input_size, ae_hidden_size)
+        self.rand_b = np.random.randn(ae_hidden_size)
+        
+        # Extreme Learning Machine Stage: Analytical solving of weights
+        self.elm_w = np.random.randn(input_size, elm_hidden_size)
+        self.elm_beta = None # Output weights solved via pseudoinverse
+
+    def train(self, x, t):
+        # 1. AE Phase: Reconstruct input to extract robust features
+        h_ae = 1 / (1 + np.exp(-(np.dot(x, self.rand_w) + self.rand_b)))
+        self.ae_beta = np.dot(np.linalg.pinv(h_ae), x) 
+        
+        # 2. ELM Phase: Map features to transmitted symbols
+        features = np.dot(h_ae, self.ae_beta)
+        h_elm = 1 / (1 + np.exp(-(np.dot(features, self.elm_w))))
+        self.elm_beta = np.dot(np.linalg.pinv(h_elm), t) # One-step solution
+\end{lstlisting}
+
+\subsection{Comparison Baselines (Traditional vs. Optimal)}
+Standard MIMO detectors used as performance benchmarks.
+
+\begin{lstlisting}[language=Python]
+# Successive Interference Cancellation (SIC) - From mimo_4.py
+def sic_detect(Y, H, base_detector='zf'):
+    """Iterative interference removal for higher accuracy in MIMO"""
+    Y_res = Y.copy()
+    x_hat = np.zeros((Y.shape[0], Nt))
+    for k in range(Nt):
+        # Step-by-step detection and subtraction
+        x_k = zf_detect(Y_res, H)[:, k]
+        x_hat[:, k] = x_k
+        Y_res = Y_res - np.outer(x_k, H[:, k])
+    return np.sign(x_hat)
+
+# Maximum Likelihood (ML) - The Theoretical Bound
+def ml_detect(Y, H):
+    """Optimal detector (Exhaustive search) used as a benchmark"""
+    candidates = np.array(list(product([-1, 1], repeat=Nt)), dtype=float)
+    Hr = np.vstack([H.real, H.imag])
+    Yr = np.hstack([Y.real, Y.imag])
+    # Euclidean distance search
+    Hc = candidates @ Hr.T
+    diff = Yr[:, None, :] - Hc[None, :, :]
+    dist = np.sum(diff**2, axis=-1)
+    return candidates[np.argmin(dist, axis=1)]
+\end{lstlisting}
+
+\begin{thebibliography}{1}
+
+\bibitem{zhao2023}
+S. Zhao, G. Yu, and Y. Feng, ``Application of ELM Algorithm Incorporating AE Principles in Wireless Communication Signal Detection,'' \textit{IEEE Access}, vol. 11, pp. 89720–32, 2023. \url{https://doi.org/10.1109/ACCESS.2023.3306470}
+
+\bibitem{liu2022}
+Y. Liu, I. Al-Nahhal, O. A. Dobre, and F. Wang, ``Deep-Learning-Based Channel Estimation for IRS-Assisted ISAC System,'' \textit{GLOBECOM 2022 - 2022 IEEE Global Communications Conference}, Dec. 2022, pp. 4220–25. \url{https://doi.org/10.1109/GLOBECOM48099.2022.10001672}
+
+\bibitem{gunduz2019}
+D. Gündüz, P. de Kerret, N. D. Sidiropoulos, D. Gesbert, Chandra R. Murthy, and Mihaela van der Schaar, ``Machine Learning in the Air,'' \textit{IEEE Journal on Selected Areas in Communications}, vol. 37, no. 10, pp. 2184–99, 2019. \url{https://doi.org/10.1109/JSAC.2019.2933969}
+
+\bibitem{liu2023}
+R. Liu, J. Zhang, L. Li, Y. Tian, and Z. Fang, ``Research on the Application of 5G mMTC in the Smart Grid,'' \textit{2023 IEEE 11th Joint International Information Technology and Artificial Intelligence Conference (ITAIC)}, Dec. 2023, pp. 94--98. \url{https://doi.org/10.1109/ITAIC58329.2023.10408759}
+
+\bibitem{huang2012}
+G.-B. Huang, H. Zhou, X. Ding, and R. Zhang, ``Extreme Learning Machine for Regression and Multiclass Classification,'' \textit{IEEE Transactions on Systems, Man, and Cybernetics, Part B (Cybernetics)}, vol. 42, no. 2, pp. 513--529, 2012. \url{https://doi.org/10.1109/TSMCB.2011.2168604}
+
+\end{thebibliography}
+
+\end{document}
